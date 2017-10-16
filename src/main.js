@@ -14,14 +14,15 @@ Vue.use(iView);
 Vue.use(Vuex);
 
 /* eslint-disable no-new */
-// new Vue({
-//   el: '#app',
-//   router,
-//   template: '<App/>',
-//   components: { App }
-// })
 new Vue({
-   store,
-   router,
-   render: h => h(App)
-}).$mount('#app')
+  el: '#app',
+  store,
+  router,
+  template: '<App/>',
+  components: { App }
+})
+// new Vue({
+//    store,
+//    router,
+//    render: h => h(App)
+// }).$mount('#app')

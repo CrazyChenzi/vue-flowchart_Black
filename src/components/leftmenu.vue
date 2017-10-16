@@ -8,9 +8,19 @@
             :id="item.id"
             :title="item.title"
             @click.stop.prevent="toggleTreeNode"
+            v-if="!item.isImg"
            >
             {{ item.title }}
         </span>
+        <img
+          :src="item.img"
+          :id="item.id"
+          :title="item.title"
+          @dragstart="dragHandle"
+          @click.stop.prevent="toggleTreeNode"
+          :draggable="item.draggable"
+          class="tree-node-title"
+          v-else />
      </div>
   </div>
 </template>
@@ -48,8 +58,20 @@ export default {
         // 唯一标识，防止在画布上拖拽时重复生成
         nodeKey: 'node-' + ((new Date()).getTime())
       }
-      event.dataTransfer.setData('Text', JSON.stringify(nodeInfo))
-      this.SET_EVENTCHILD(event);
+      let nodeImgInfo = {
+        id: event.target.id,
+        title: event.target.title,
+        img: event.target.src,
+        // 唯一标识，防止在画布上拖拽时重复生成
+        nodeKey: 'node-' + ((new Date()).getTime())
+      }
+      if(event.target.src !== undefined) {
+         event.dataTransfer.setData('Text', JSON.stringify(nodeImgInfo))
+         this.SET_EVENTCHILD(event);
+      }else {
+         event.dataTransfer.setData('Text', JSON.stringify(nodeInfo))
+         this.SET_EVENTCHILD(event);
+      }
     }
   }
 }

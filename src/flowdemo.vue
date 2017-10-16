@@ -5,14 +5,14 @@
             <left-menu :leftArray="leftArray"></left-menu>
          </Col>
          <Col span="20" class="flowdemo" style="background: #19be6b">
-            <div id="div1" @drop="drop" class="canvas-node-box"
-            @dragover="allowDrop"></div>
+            <right-container :node="node"></right-container>
          </Col>
       </Row>
    </div>
 </template>
 <script>
    import leftmenu from './components/leftmenu.vue'
+   import rightContainer from './components/rightContainer.vue'
    import { mapState, mapMutations } from 'vuex'
    export default {
       data() {
@@ -21,29 +21,36 @@
                {
                    id: '1',
                    title: '组件1',
+                   isImg: false,
                    draggable: true
                },
                {
                    id: '2',
                    title: '组件2',
+                   isImg: false,
                    draggable: true
                },
                {
                    id: '3',
                    title: '组件3',
+                   isImg: false,
                    draggable: true
                },
                {
-                   id: '4',
-                   title: '组件4',
-                   draggable: true
+                  id: '4',
+                  title: '组件4',
+                  isImg: true,
+                  img: '../static/img/demo.jpg',
+                  draggable: true
                },
                {
                    id: '5',
                    title: '组件5',
+                   isImg: false,
                    draggable: true
                },
-            ]
+            ],
+            node: {}
          }
       },
       computed: {
@@ -52,7 +59,8 @@
 		   ]),
       },
       components: {
-         'left-menu': leftmenu
+         'left-menu': leftmenu,
+         'right-container': rightContainer
       },
       methods: {
          allowDrop : function(event) {
@@ -78,6 +86,9 @@
             var node=document.createTextNode(data.title);
             para.setAttribute("class", data.nodeKey)
             para.appendChild(node);
+            para.draggable = true;
+            // para.ondrop = this.drop(event);
+            para.ondragover = this.allowDrop(event);
             para.style.position = "absolute";
             para.style.left = offsetX + 'px';
             para.style.top = offsetY + 'px';
@@ -86,6 +97,7 @@
             para.style.height = '100px';
             event.target.appendChild(para);
             event.preventDefault();
+            console.log(para)
          },
          drag : function(event) {
             event.dataTransfer.setData("Text",event.target.id);
@@ -96,6 +108,7 @@
 <style lang="less" scoped>
    .flowdemo {
       height: calc(100vh);
+      overflow: hidden;
    }
    #div1 {width:100%;height:100%;padding:10px;border:1px solid red;}
 </style>

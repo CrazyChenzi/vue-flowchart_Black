@@ -1,3 +1,7 @@
 export default {
-   eventChild: {}
+   eventChild: {},
+   nodeList: [],
+   contextmenu: {},
+   isShowEdit: false,
+   editClickNum: 0
 }
