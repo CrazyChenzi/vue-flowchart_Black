@@ -27,7 +27,7 @@
       },
       computed: {
         ...mapState([
-          'nodeList', 'contextmenu', 'editClickNum'
+          'nodeList', 'contextmenu', 'editClickNum', 'editNodeKey'
        ]),
        style: function () {
          let _t = this
@@ -48,6 +48,8 @@
                        onOk: () => {
                            this.$Message.info('点击了确定');
                            this.$store.dispatch('nodeLists', [])
+                           this.$store.dispatch('editClickNum', 0)
+                           this.$store.dispatch('isShowEdit', false)
                        },
                        onCancel: () => {
                            this.$Message.info('点击了取消');
@@ -68,6 +70,8 @@
                        onOk: () => {
                            this.$Message.info('点击了确定');
                            this.$store.dispatch('nodeLists', [])
+                           this.$store.dispatch('editClickNum', 0)
+                           this.$store.dispatch('isShowEdit', false)
                        },
                        onCancel: () => {
                            this.$Message.info('点击了取消');
@@ -84,7 +88,23 @@
                case 'node-remove':
                   this.nodeList.forEach((item, index) => {
                      if(item.nodeKey === this.contextmenu.id) {
-                        this.nodeList.splice(index, 1)
+                        if(this.editNodeKey === item.nodeKey) {
+                           this.$Modal.confirm({
+                             title: '确认删除',
+                             content: '<p>该面板正处于编辑状态，确认删除？</p>',
+                             onOk: () => {
+                                 this.$Message.info('点击了确定');
+                                 this.$store.dispatch('isShowEdit', false)
+                                 this.$store.dispatch('editNodeKey', '')
+                                 this.nodeList.splice(index, 1)
+                             },
+                             onCancel: () => {
+                                 this.$Message.info('点击了取消');
+                             }
+                           });
+                        }else {
+                           this.nodeList.splice(index, 1)
+                        }
                      }
                   })
                   break;
@@ -97,7 +117,7 @@
 <style lang="less" scoped>
    .canvas-contextmenu {
      position: absolute;
-     z-index: 1500;
+     z-index: 2500;
      display: inline-block;
      /*height: 120px;*/
      /*width: 100px;*/

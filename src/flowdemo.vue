@@ -110,5 +110,4 @@
       height: calc(100vh);
       overflow: hidden;
    }
-   #div1 {width:100%;height:100%;padding:10px;border:1px solid red;}
 </style>

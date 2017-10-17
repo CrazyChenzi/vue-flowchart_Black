@@ -13,8 +13,8 @@
          v-if="nodeInfo.img === undefined"
          @click="clickNode(nodeInfo.nodeKey)"
       >
-         <span class="node-content">
-            {{ nodeInfo.title }}
+         <span class="node-content" :draggable="nodeInfo.draggable" :id="nodeInfo.nodeKey">
+            {{ nodeInfo.title }}{{nodeInfo.draggable}}
          </span>
       </div>
       <div
@@ -30,7 +30,7 @@
          v-else
          @click="clickNode(nodeInfo.nodeKey)"
       >
-         <img :src="nodeInfo.img" class="img-node" :id="nodeInfo.nodeKey" :style="nodeInfo.style"/>
+         <img :src="nodeInfo.img" class="img-node" :id="nodeInfo.nodeKey" :style="nodeInfo.style" :draggable="nodeInfo.draggable"/>
       </div>
    </div>
 </template>
@@ -63,6 +63,8 @@
                  onOk: () => {
                      this.$Message.info('点击了确定');
                      this.$store.dispatch('nodeLists', [])
+                     this.$store.dispatch('editClickNum', 0)
+                     this.$store.dispatch('isShowEdit', false)
                  },
                  onCancel: () => {
                      this.$Message.info('点击了取消');
@@ -79,9 +81,15 @@
       height: 50px;
       color: #fff;
       background: red;
+      text-align: center;
    }
    .node:hover {
       opacity: 0.8;
+   }
+   .node-content {
+     /*display: inline-block;*/
+     /*width: 100%;*/
+     /*text-align: center;*/
    }
    .img-node {
       width: 100px;

@@ -22,7 +22,7 @@
              :prop="nodeOptions.options[index].label"
            >
             <div v-if="nodeOptions.options[index].value === 'true' || nodeOptions.options[index].value === 'false'">
-               <i-switch size="large" v-model="nodeOptions.options[index].value === 'true' ? true : false">
+               <i-switch size="large" v-model="nodeOptions.options[index].value === 'true' ? true : false" @on-change="change">
                   <span slot="open">开启</span>
                   <span slot="close">关闭</span>
                </i-switch>
@@ -58,7 +58,8 @@
            isShow: state => state.isShowEdit,
            nodeList: state => state.nodeList,
            contextmenu: state => state.contextmenu,
-           editClickNum: state => state.editClickNum
+           editClickNum: state => state.editClickNum,
+           editNodeKey: state => state.editNodeKey
          })
       },
       watch: {
@@ -83,34 +84,48 @@
                   ]
                   this.isNoData = true
                   this.nodeOptions.options = array;
+                  this.nodeOptions.nodeKey = this.nodeList[i].nodeKey;
+                  this.$store.dispatch('editNodeKey', this.nodeOptions.nodeKey)
                   break;
                }else {
                   this.isNoData = false;
                }
             }
             this.$forceUpdate()
+         },
+         editNodeKey : function(newVal) {
+            if(newVal === "") {
+               this.nodeOptions.options = [];
+            }
          }
       },
       mounted() {
-         // for(let i = 0; i < this.nodeList.length; i++) {
-         //    if(this.nodeList[i] === this.contextmenu.id) {
-         //       this.nodeOptions = this.nodeList[i];
-         //       console.log(this.nodeOptions)
-         //       this.isNoData = true;
-         //       break;
-         //    }else {
-         //       this.isNoData = false;
-         //       this.$Message.warning("没有匹配到信息");
-         //    }
-         // }
       },
       methods: {
+         change (status) {
+            this.$Message.info('开关状态：' + status);
+            this.nodeOptions.options[0].value = status + '';
+         },
          saveNodeOptions : function() {
-
+            let array = {};
+            array.draggable = this.nodeOptions.options[0].value
+            array.img = this.nodeOptions.options[1].value
+            array.title = this.nodeOptions.options[2].value
+            console.log(array)
+            console.log(this.nodeList)
+            for(let i = 0; i < this.nodeList.length; i++) {
+               if(this.nodeList[i].nodeKey === this.nodeOptions.nodeKey) {
+                  this.nodeList[i].draggable = array.draggable
+                  this.nodeList[i].img = array.img
+                  this.nodeList[i].title = array.title
+                  break;
+               }
+            }
          },
          handleClose : function() {
             this.nodeOptions.options = [];
             this.$store.dispatch('isShowEdit', false)
+            this.$store.dispatch('editNodeKey', '')
          }
       }
    }
