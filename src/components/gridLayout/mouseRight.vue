@@ -16,13 +16,31 @@
     },
     computed: {
       ...mapState({
-        mouseRightMenu: state => state.layout.mouseRightMenu
+        mouseRightMenu: state => state.layout.mouseRightMenu,
+        layoutNodeList: state => state.layout.layoutNodeList
       }),
       style: function () {
         let _t = this
         return {
           left: parseInt(_t.mouseRightMenu.positionX) + 'px',
           top: parseInt(_t.mouseRightMenu.positionY) + 'px'
+        }
+      }
+    },
+    methods: {
+      handleClick: function(type, ev) {
+        switch(type) {
+          case 'node-edit':
+            alert("未完成")
+            break;
+          case 'node-remove':
+            for(let j = 0; j < this.layoutNodeList.length; j++) {
+              if(this.layoutNodeList[j].i === this.mouseRightMenu.id) {
+                this.layoutNodeList.splice(j, 1);
+              }
+            }
+            this.$store.dispatch('layoutNodeList', this.layoutNodeList);
+            break;
         }
       }
     }

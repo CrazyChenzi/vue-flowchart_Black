@@ -12,11 +12,23 @@
 				leftMenu: [
 					{
 						title: '测试1',
-						draggable: true
+						draggable: true,
+						img: ''
 					},
 					{
 						title: '测试2',
-						draggable: true
+						draggable: true,
+						img: ''
+					},
+					{
+						title: '图标1',
+						draggable: true,
+						img: '../static/img/demo.jpg'
+					},
+					{
+						title: '图标2',
+						draggable: true,
+						img: '../static/img/demo1.png'
 					}
 				]
 			}

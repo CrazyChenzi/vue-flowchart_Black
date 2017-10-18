@@ -5,54 +5,31 @@
     class="layout-container" 
     @click="clickPanel"
     @contextmenu.stop.prevent="canvasRightClick">
-    <grid-layout 
-			:layout="layoutNodeList" 
-			:col-num="12" 
-			:row-height="30" 
-			:is-draggable="true" 
-			:is-resizable="true" 
-			:vertical-compact="true" 
-			:margin="[10, 10]" 
-			:use-css-transforms="true">
-			<grid-item v-for="(item,index) in layoutNodeList" :key="index" 
-				:x="item.x" 
-				:y="item.y" 
-				:w="item.w" 
-				:h="item.h" 
-				:i="item.i" 
-        :id="item.i"
-				@resize="resizeEvent" 
-				@move="moveEvent" 
-				@resized="resizedEvent" 
-				@moved="movedEvent" 
-        @dblclick.native="toChildren(index)"
-        ref="gridItem"
-				style="background-color:#e9eaec">
-				<!--{{ item.i }} "+" {{ item.title }}-->
-        <equipment :layoutNodeChildrens="layoutNodeChildren" 
-        v-if="layoutNodeChildren.length > 0 ? layoutNodeChildren[0].key === item.i ? true : false : false"></equipment>
-			</grid-item>
-		</grid-layout>
     <mouse-right></mouse-right>
+    <dbl-model :dblChildrenModel="dblChildrenModel" @dblReturn="getDblReturn"></dbl-model>
+    <right-container :nodeList="layoutNodeList"></right-container>
   </div>
 </template>
 <script>
-  import { GridLayout, GridItem } from 'vue-grid-layout'
   import { mapState } from 'vuex'
   import equipment from './equipment'
   import mouseRight from './mouseRight'
+  import dblModel from './dblModel'
+  import rightContainer from './rightContainer'
   var testLayout = [
 	];
   export default {
     components: {
-			'grid-layout': GridLayout,
-			'grid-item': GridItem,
       equipment,
-      'mouse-right': mouseRight
+      'mouse-right': mouseRight,
+      'dbl-model': dblModel,
+      'right-container': rightContainer
 		},
     data() {
       return {
-        layout: []
+        layout: [],
+        dblChildrenModel: false,
+        index: 0
       }
     },
     computed: {
@@ -60,24 +37,29 @@
         layoutNodeList: state => state.layout.layoutNodeList,
         layoutNodeChildren: state => state.layout.layoutNodeChildren,
         layoutParentStyle: state => state.layout.layoutParentStyle,
-        mouseRightMenu: state => state.layout.mouseRightMenu
+        mouseRightMenu: state => state.layout.mouseRightMenu,
+        childrenKey: state => state.layout.childrenKey
       })
     },
     methods: {
       dropHandle: function(ev) {
         let setEv = JSON.parse(ev.dataTransfer.getData('Text'))
-        this.layoutNodeList.push(JSON.parse(ev.dataTransfer.getData('Text')))
+        if(this.childrenKey !== '') {
+          setEv.childrenKey = this.childrenKey
+        }
+        setEv.children = [];
+        setEv.children.push(JSON.parse(ev.dataTransfer.getData('Text')))
+        console.log(setEv)
+        // setTimeout(()=> {
+        //   setEv.width = this.$refs.gridItem[this.layoutNodeList.length-1].interactObj.target.offsetWidth,
+        //   setEv.height = this.$refs.gridItem[this.layoutNodeList.length-1].interactObj.target.offsetHeight
+        //   // this.layoutParentStyle.push(style);
+        //   // this.$store.dispatch('layoutParentStyle', this.layoutParentStyle);
+        // },100)
+        this.layoutNodeList.push(setEv)
         this.$store.dispatch('layoutNodeList', this.layoutNodeList);
         this.layout = this.layoutNodeList;
-        setTimeout(()=> {
-          let style = {
-            key: setEv.i,
-            width: this.$refs.gridItem[this.layoutNodeList.length-1].interactObj.target.offsetWidth,
-            height: this.$refs.gridItem[this.layoutNodeList.length-1].interactObj.target.offsetHeight
-          }
-          this.layoutParentStyle.push(style);
-          this.$store.dispatch('layoutParentStyle', this.layoutParentStyle);
-        },100)
+        console.log(this.layoutNodeList)
       },
       allowDrop: function(ev) {
         ev.preventDefault();
@@ -92,42 +74,67 @@
           id: event.target.id,
           isShow: true
         }
+        console.log(params)
+        console.log(event)
         this.$store.dispatch('mouseRightMenu', params);
       },
       clickPanel: function() {
         this.$store.dispatch('mouseRightMenu', {});
       },
       toChildren: function(index) {
-         let params = [
-          {
-            src: '../../../static/img/demo.jpg',
-            title: '设备1',
-            key: this.layoutNodeList[index].i,
-            parentsWidth: this.layoutParentStyle[index].width,
-            parentsHeight: this.layoutParentStyle[index].height
-          },
-          {
-            src: '../../../static/img/demo1.png',
-            title: '设备2',
-            key: this.layoutNodeList[index].i,
-            parentsWidth: this.layoutParentStyle[index].width,
-            parentsHeight: this.layoutParentStyle[index].height
-          }
-        ];
-        if(this.layoutNodeList.length === 1) {
-          this.$store.dispatch('layoutNodeChildren', params);
+        this.index = index;
+        if(this.childrenKey !== '') {
+          this.dblChildrenModel = true;
+        }else {
+          this.$Modal.confirm({
+            title: '编辑子集',
+            content: '<p>面板中有内容尚未保存，确定继续？</p>',
+            onOk: () => {
+              this.$Message.info('点击了确定');
+              this.setLocalS(this.layoutNodeList, index);
+            },
+            onCancel: () => {
+              this.$Message.info('点击了取消');
+            }
+          });
         }
-        this.$Modal.confirm({
-          title: '编辑子集',
-          content: '<p>面板中有内容尚未保存，确定继续？</p>',
-          onOk: () => {
-            this.$Message.info('点击了确定');
-            this.$store.dispatch('layoutNodeList', []);
-          },
-          onCancel: () => {
-            this.$Message.info('点击了取消');
-          }
-        });
+      },
+      setLocalS: function(array, index) {
+        localStorage.parents = {};
+        localStorage.parents = JSON.stringify(array);
+        console.log(localStorage.parents)
+        this.$store.dispatch('childrenKey', array[index].i);
+        this.$store.dispatch('layoutNodeList', []);
+      },
+      getDblReturn: function(name) {
+        switch(name) {
+          case 'exit': 
+            this.dblChildrenModel = false
+            break;
+          case 'ok':
+            this.dblChildrenModel = false
+            this.setLocalS(this.layoutNodeList, this.index)
+            break;
+          case 'return':
+            this.dblChildrenModel = false
+            let array = this.layoutNodeList;
+            let parents = JSON.parse(localStorage.parents);
+            for(let j = 0; j < array.length; j++) {
+              for(let k = 0; k < parents.length; k++) {
+                if(array[j].childrenKey === parents[k].i) {
+                  array[j].parentsWidth = parents[k].width;
+                  array[j].parentsHeight = parents[k].height;
+                }
+              }
+            }
+            console.log(array)
+            console.log(parents)
+            this.$store.dispatch('layoutNodeChildren', array)
+            this.$store.dispatch('layoutNodeList', parents);
+            console.log(this.layoutNodeChildren)
+            break;
+        }
+        console.log(name)
       },
       moveEvent: function(i, newX, newY){
         console.log("MOVE i=" + i + ", X=" + newX + ", Y=" + newY);
@@ -148,23 +155,13 @@
      * 
      */
       resizedEvent: function(i, newH, newW, newHPx, newWPx){
-        styleBreak : for(let j = 0; j < this.layoutParentStyle.length; j++) {
-          if(this.layoutParentStyle[j].key === i) {
-            this.layoutParentStyle[j].width = newWPx;
-            this.layoutParentStyle[j].height = newHPx;
-            for(let k = 0; k < this.layoutNodeChildren.length; k++) {
-              if(this.layoutNodeChildren[k].key === this.layoutParentStyle[j].key) {
-                this.layoutNodeChildren[k].parentsWidth = newWPx;
-                this.layoutNodeChildren[k].parentsHeight = newHPx;
-              }
-              if(k === this.layoutNodeChildren.length) {
-                break styleBreak
-              }
-            }
+        styleBreak : for(let j = 0; j < this.layoutNodeList.length; j++) {
+          if(this.layoutNodeList[j].i === i) {
+            this.layoutNodeList[j].width = newWPx;
+            this.layoutNodeList[j].height = newHPx;
           }
         }
-        this.$store.dispatch('layoutParentStyle', this.layoutParentStyle);
-        this.$store.dispatch('layoutNodeChildren', this.layoutNodeChildren);
+        this.$store.dispatch('layoutNodeList', this.layoutNodeList);
         console.log("RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
       },
     }

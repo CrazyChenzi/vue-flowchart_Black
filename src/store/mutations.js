@@ -28,5 +28,8 @@ export default {
   },
   ['SET_MOUSERIGHTMENU'](state, res) {
       state.layout.mouseRightMenu = res;
+  },
+  ['SET_CHILDREN_KEY'](state, res) {
+      state.layout.childrenKey = res;
   }
 }

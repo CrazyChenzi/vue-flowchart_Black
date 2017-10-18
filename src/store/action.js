@@ -25,5 +25,8 @@ export default {
   },
   mouseRightMenu: ({ commit }, param) => {
     commit('SET_MOUSERIGHTMENU', param)
+  },
+  childrenKey: ({ commit }, param) => {
+    commit('SET_CHILDREN_KEY', param)
   }
 }

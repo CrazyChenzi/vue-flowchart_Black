@@ -5,8 +5,10 @@
         :draggable="item.draggable"
         @dragstart="drag"
         :title="item.title"
+        :img="item.img"
       >
-      {{ item.title }}
+      <img :src="item.img" v-if="item.img !== ''" style="width: inherit; height: inherit;" :title="item.title" />
+      <span v-else>{{ item.title }}</span>
       </li>
     </ul>
   </div>
@@ -33,12 +35,15 @@
       drag: function(event) {
         let params = {
           title: event.target.title,
+          img: event.target.src === undefined ? '' : event.target.src,
           i: 'black'+new Date().getTime(),
           x: 0,
           y: 0,
           w: 2,
           h: 2
         }
+        // console.log(params)
+        // console.log(event)
         // this.layoutNodeList.push(params)
         event.dataTransfer.setData("Text",JSON.stringify(params));
         // this.$store.dispatch('layoutNodeList', this.layoutNodeList);

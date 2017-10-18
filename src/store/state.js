@@ -10,6 +10,7 @@ export default {
      layoutNodeList: [],
      layoutNodeChildren: [],
      layoutParentStyle: [],
-     mouseRightMenu: {}
+     mouseRightMenu: {},
+     childrenKey: ''
    }
 }
