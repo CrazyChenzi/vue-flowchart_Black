@@ -7,7 +7,7 @@
     @contextmenu.stop.prevent="canvasRightClick">
     <mouse-right></mouse-right>
     <dbl-model :dblChildrenModel="dblChildrenModel" @dblReturn="getDblReturn"></dbl-model>
-    <right-container :nodeList="layoutNodeList"></right-container>
+    <right-container :nodeList="layoutNodeList" @dblRightConrainer="toChildren"></right-container>
   </div>
 </template>
 <script>
@@ -38,17 +38,20 @@
         layoutNodeChildren: state => state.layout.layoutNodeChildren,
         layoutParentStyle: state => state.layout.layoutParentStyle,
         mouseRightMenu: state => state.layout.mouseRightMenu,
-        childrenKey: state => state.layout.childrenKey
+        parentParams: state => state.layout.parentParams,
+        nodeListStorage: state => state.layout.nodeListStorage
       })
     },
     methods: {
       dropHandle: function(ev) {
         let setEv = JSON.parse(ev.dataTransfer.getData('Text'))
-        if(this.childrenKey !== '') {
-          setEv.childrenKey = this.childrenKey
+        setEv.width = 200
+        setEv.height = 70
+        setEv.background = '#2d8cf0'
+        if(this.parentParams.parentKey !== undefined) {
+          setEv.parentParams = this.parentParams
+          setEv.background = '#e84646'
         }
-        setEv.children = [];
-        setEv.children.push(JSON.parse(ev.dataTransfer.getData('Text')))
         console.log(setEv)
         // setTimeout(()=> {
         //   setEv.width = this.$refs.gridItem[this.layoutNodeList.length-1].interactObj.target.offsetWidth,
@@ -81,30 +84,35 @@
       clickPanel: function() {
         this.$store.dispatch('mouseRightMenu', {});
       },
-      toChildren: function(index) {
-        this.index = index;
-        if(this.childrenKey !== '') {
+      toChildren: function(msg) {
+        console.log(msg.i)
+        if(this.parentParams.parentKey !== undefined) {
           this.dblChildrenModel = true;
         }else {
           this.$Modal.confirm({
             title: '编辑子集',
-            content: '<p>面板中有内容尚未保存，确定继续？</p>',
+            content: '<p>面板中有内容尚未保存，确定继续？继续后将会为你暂存内容!</p>',
             onOk: () => {
               this.$Message.info('点击了确定');
-              this.setLocalS(this.layoutNodeList, index);
+              this.$store.dispatch('nodeListStorage', this.layoutNodeList);
+              let params = {
+                parentKey: msg.i,
+                parentWidth: msg.width,
+                parentHeight: msg.height,
+                parentW: msg.w,
+                parentH: msg.h,
+                parentX: msg.x,
+                parentY: msg.y
+              }
+              console.log(msg)
+              this.$store.dispatch('parentParams', params);
+              this.$store.dispatch('layoutNodeList', []);
             },
             onCancel: () => {
               this.$Message.info('点击了取消');
             }
           });
         }
-      },
-      setLocalS: function(array, index) {
-        localStorage.parents = {};
-        localStorage.parents = JSON.stringify(array);
-        console.log(localStorage.parents)
-        this.$store.dispatch('childrenKey', array[index].i);
-        this.$store.dispatch('layoutNodeList', []);
       },
       getDblReturn: function(name) {
         switch(name) {
@@ -117,21 +125,39 @@
             break;
           case 'return':
             this.dblChildrenModel = false
-            let array = this.layoutNodeList;
-            let parents = JSON.parse(localStorage.parents);
-            for(let j = 0; j < array.length; j++) {
-              for(let k = 0; k < parents.length; k++) {
-                if(array[j].childrenKey === parents[k].i) {
-                  array[j].parentsWidth = parents[k].width;
-                  array[j].parentsHeight = parents[k].height;
-                }
+            let parentKey = this.layoutNodeList[0].parentParams.parentKey;
+            for(let j = 0; j < this.nodeListStorage.length; j++) {
+              if(this.nodeListStorage[j].i === parentKey) {
+                this.nodeListStorage[j].children = [];
+                this.layoutNodeList.forEach((item, index) => {
+                  item.width = (item.width/(document.documentElement.clientWidth - 319.98 - 20)) * item.parentParams.parentWidth;
+                  item.height = (item.height/(document.documentElement.clientHeight  - 20)) * item.parentParams.parentHeight;
+                  item.drag = false;
+                  item.w = (item.w / 12) * item.parentParams.parentW;
+                  item.h = (item.h / 30) * item.parentParams.parentH;
+                  // item.x = (item.x / 10) * item.parentParams.parentX;
+                  item.testY = true;
+                  // item.y = (item.parentParams.parentY + item.y/4*item.parentParams.parentH);
+                  if(index === 1) {
+                    // item.y = 2
+                  }
+                  // *(item.parentParams.parentH/document.documentElement.clientHeight)
+                })
+                console.log(this.layoutNodeList)
+                setTimeout(() => {
+                  this.nodeListStorage[j].children = this.layoutNodeList;
+                  this.$store.dispatch('layoutNodeList', []);
+                  this.$store.dispatch('layoutNodeList', this.nodeListStorage);
+                  this.$store.dispatch('nodeListStorage', []);
+                  console.log(this.layoutNodeList)
+                }, 200)
+                
               }
             }
-            console.log(array)
-            console.log(parents)
-            this.$store.dispatch('layoutNodeChildren', array)
-            this.$store.dispatch('layoutNodeList', parents);
-            console.log(this.layoutNodeChildren)
+            console.log(parentKey)
+            // this.$store.dispatch('layoutNodeChildren', array)
+            // this.$store.dispatch('layoutNodeList', parents);
+            // console.log(this.layoutNodeChildren)
             break;
         }
         console.log(name)

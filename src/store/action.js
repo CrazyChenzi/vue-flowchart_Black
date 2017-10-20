@@ -26,7 +26,13 @@ export default {
   mouseRightMenu: ({ commit }, param) => {
     commit('SET_MOUSERIGHTMENU', param)
   },
-  childrenKey: ({ commit }, param) => {
-    commit('SET_CHILDREN_KEY', param)
+  parentParams: ({ commit }, param) => {
+    commit('SET_PARENTPARAMS', param)
+  },
+  nodeListStorage: ({ commit }, param) => {
+    commit('SET_NODELIST_STORAGE', param)
+  },
+  hoverPopper: ({ commit }, param) => {
+    commit('SET_HOVERPOPPER', param)
   }
 }

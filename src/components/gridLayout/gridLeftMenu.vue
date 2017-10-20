@@ -6,9 +6,14 @@
         @dragstart="drag"
         :title="item.title"
         :img="item.img"
+        :backImg="item.backgroundImg"
       >
-      <img :src="item.img" v-if="item.img !== ''" style="width: inherit; height: inherit;" :title="item.title" />
-      <span v-else>{{ item.title }}</span>
+        <img :src="item.img" v-if="item.img !== ''" style="width: inherit; height: inherit;" :title="item.title" :name="item.backgroundImg"/>
+        <div v-else-if="item.backgroundImg !== ''" :style="backgroundImgStyle(item.backgroundImg)">
+          <span style="color: black;font-size: 16px;font-weight: bolder; position: absolute; left: 15px;">{{ item.title }}：</span>
+          <img :src="item.backgroundImg" style="width: inherit; height: inherit;" :title="item.title" :name="item.backgroundImg" />
+        </div>
+        <span v-else>{{ item.title }}</span>
       </li>
     </ul>
   </div>
@@ -37,16 +42,20 @@
           title: event.target.title,
           img: event.target.src === undefined ? '' : event.target.src,
           i: 'black'+new Date().getTime(),
+          backImg: event.target.name,
           x: 0,
           y: 0,
           w: 2,
           h: 2
         }
         // console.log(params)
-        // console.log(event)
+        // console.log(event.target.name)
         // this.layoutNodeList.push(params)
         event.dataTransfer.setData("Text",JSON.stringify(params));
         // this.$store.dispatch('layoutNodeList', this.layoutNodeList);
+      },
+      backgroundImgStyle: function (img) {
+        return 'width:inherit;height:inherit;opacity: 0.7;'
       }
     }
   }

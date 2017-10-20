@@ -11,6 +11,8 @@ export default {
      layoutNodeChildren: [],
      layoutParentStyle: [],
      mouseRightMenu: {},
-     childrenKey: ''
+     parentParams: {},
+     nodeListStorage: [],
+     hoverPopper: {}
    }
 }

@@ -13,22 +13,32 @@
 					{
 						title: '测试1',
 						draggable: true,
-						img: ''
+						img: '',
+						backgroundImg: ''
 					},
 					{
 						title: '测试2',
 						draggable: true,
-						img: ''
+						img: '',
+						backgroundImg: ''
 					},
 					{
 						title: '图标1',
 						draggable: true,
-						img: '../static/img/demo.jpg'
+						img: '../static/img/demo.jpg',
+						backgroundImg: ''
 					},
 					{
 						title: '图标2',
 						draggable: true,
-						img: '../static/img/demo1.png'
+						img: '../static/img/demo1.png',
+						backgroundImg: ''
+					},
+					{
+						title: '背景1',
+						draggable: true,
+						img: '',
+						backgroundImg: '../static/img/demo1.png'
 					}
 				]
 			}

@@ -29,7 +29,13 @@ export default {
   ['SET_MOUSERIGHTMENU'](state, res) {
       state.layout.mouseRightMenu = res;
   },
-  ['SET_CHILDREN_KEY'](state, res) {
-      state.layout.childrenKey = res;
+  ['SET_PARENTPARAMS'](state, res) {
+      state.layout.parentParams = res;
+  },
+  ['SET_NODELIST_STORAGE'](state, res) {
+      state.layout.nodeListStorage = res;
+  },
+  ['SET_HOVERPOPPER'](state, res) {
+      state.layout.hoverPopper = res;
   }
 }
