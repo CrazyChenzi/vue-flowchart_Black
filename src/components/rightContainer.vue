@@ -43,8 +43,8 @@
       },
       methods: {
          ...mapMutations([
-   		   'SET_NODELIST'
-   		]),
+   		     'SET_NODELIST'
+   		  ]),
          displayRightMenu: function () {
             if(this.contextmenu.isShow !== undefined) {
                this.contextmenu.isShow = false;

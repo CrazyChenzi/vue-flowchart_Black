@@ -10,9 +10,10 @@
       :vertical-compact="true"  
       :margin="[10, 10]" 
       :use-css-transforms="true">
+      <!--item.testY !== undefined ? item.x : item.testY !== undefined ? item.y :-->
       <grid-item v-for="(item,index) in nodeList" :key="index" 
-        :x="item.testY !== undefined ? item.x : item.x" 
-        :y="item.testY !== undefined ? item.y*2 : item.y" 
+        :x="item.x" 
+        :y="item.testY !== undefined ? Number(2 * item.y) : item.y" 
         :w="item.w" 
         :h="item.h" 
         :i="item.i" 

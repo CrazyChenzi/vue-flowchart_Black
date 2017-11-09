@@ -48,6 +48,7 @@
         setEv.width = 200
         setEv.height = 70
         setEv.background = '#2d8cf0'
+        setEv.drag = true
         if(this.parentParams.parentKey !== undefined) {
           setEv.parentParams = this.parentParams
           setEv.background = '#e84646'
@@ -149,6 +150,7 @@
                   this.$store.dispatch('layoutNodeList', []);
                   this.$store.dispatch('layoutNodeList', this.nodeListStorage);
                   this.$store.dispatch('nodeListStorage', []);
+                  this.$store.dispatch('parentParams', {});
                   console.log(this.layoutNodeList)
                 }, 200)
                 
